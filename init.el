@@ -292,3 +292,7 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 
 ;;ox html
 (require 'ox-html5slide)
+
+;;set up autopair and visualine
+(setq electric-pair-mode t)
+(setq visual-line-mode t)
