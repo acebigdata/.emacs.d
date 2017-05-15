@@ -252,3 +252,43 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 
 ;; use python3
 (setq py-python-command "/home/isaac/anaconda3/bin/python3.6")
+
+;; Org-mode Export
+(setq org-export-creator-string nil)
+(setq org-html-validation-link nil)
+(setq org-export-with-timestamps nil)
+
+;; Org-bullet
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+;; org-twbs
+(require 'ox-twbs)
+(setq org-publish-project-alist
+      '(("org-notes"
+         :base-directory "~/org/"
+         :publishing-directory "~/public_html/"
+         :publishing-function org-twbs-publish-to-html
+         :with-sub-superscript nil
+         )))
+
+(defun my-org-publish-buffer ()
+  (interactive)
+  (save-buffer)
+  (save-excursion (org-publish-current-file))
+  (let* ((proj (org-publish-get-project-from-filename buffer-file-name))
+         (proj-plist (cdr proj))
+         (rel (file-relative-name buffer-file-name
+                                  (plist-get proj-plist :base-directory)))
+         (dest (plist-get proj-plist :publishing-directory)))
+    (browse-url (concat "file://"
+                        (file-name-as-directory (expand-file-name dest))
+                        (file-name-sans-extension rel)
+                        ".html"))))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (local-set-key (kbd "M-\\") 'org-twbs-publish-to-html)))
+
+;;ox html
+(require 'ox-html5slide)
