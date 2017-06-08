@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: R
+# key: obr
+# --
+#+begin_src R :results output org :exports both
+
+#+end_src

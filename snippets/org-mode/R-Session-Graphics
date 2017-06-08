@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: R Session Graphics
+# key: obrsg
+# --
+#+BEGIN_SRC R :session :file  :results graphics :exports both
+
+#+END_SRC

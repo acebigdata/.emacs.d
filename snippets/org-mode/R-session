@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: R Session 
+# key: obrs
+# --
+#+BEGIN_SRC R :session ${1::file ${2:$$(let ((temporary-file-directory "./")) (make-temp-file "py" nil ".png"))} }:exports ${3:both}
+$0
+#+END_SRC

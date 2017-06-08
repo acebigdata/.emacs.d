@@ -22,6 +22,9 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 143 :width normal :foundry "PfEd" :family "DejaVu Sans Mono")))))
 
+;; set autopair and visual line mode
+(electric-pair-mode 1)
+(global-visual-line-mode 1)
 ;; Set up Neotree
 (add-to-list 'load-path "/home/isaac/.emacs.d/neotree")
 (require 'neotree)
@@ -236,6 +239,7 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
  '(
    (shell . t)
    (python . t)
+   (ipython . t)
    (R . t)
    (ruby . t)
    (ditaa . t)
@@ -243,6 +247,9 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
    (octave . t)
    (sqlite . t)
    (perl . t)
+   (js . t)
+   (latex . t)
+   (C . t)
    ))
 
 ; Add short cut keys for the org-agenda
@@ -254,13 +261,15 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 (setq py-python-command "/home/isaac/anaconda3/bin/python3.6")
 
 ;; Org-mode Export
-(setq org-export-creator-string nil)
+;(setq org-export-creator-string nil)
+;(setq org-export-with-author nil)
 (setq org-html-validation-link nil)
 (setq org-export-with-timestamps nil)
 
 ;; Org-bullet
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(setq org-hide-leading-starts 1)
 
 ;; org-twbs
 (require 'ox-twbs)
@@ -293,6 +302,126 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 ;;ox html
 (require 'ox-html5slide)
 
-;;set up autopair and visualine
-(setq electric-pair-mode t)
-(setq visual-line-mode t)
+;; downward-pointing arrow for stuffs under a headline
+(setq org-ellipsis "⤵")
+
+;; syntax highlighting in source blocks while editing
+(setq org-src-fontify-natively t)
+
+;;emacs ipython
+(require 'ein)
+
+;; anaconda mode
+(add-hook 'python-mode-hook 'anaconda-mode)
+
+;; add python shell
+(add-to-list 'python-shell-extra-pythonpaths "/home/isaac/anaconda3/bin/python3.6")
+(setq python-shell-interpreter "/home/isaac/anaconda3/bin/python3.6")
+(setq exec-path (append exec-path '("/home/isaac/anaconda3/bin/")))
+(setq python-shell-prompt-detect-failure-warning nil)
+
+;don't prompt me to confirm everytime I want to evaluate a block
+(setq org-confirm-babel-evaluate nil)
+;;; display/update images in the buffer after I evaluate
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+
+;;; Set up the window split vertically
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+(global-set-key (kbd "C-c C-\\") 'toggle-window-split)
+
+;;Open browser in google chrome
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "google-chrome")
+
+;; use syntax highlighting in source block while editing
+(setq org-src-fontify-natively t)
+
+;; Always use company-mode
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; yasnippet
+(setq yas-snippet-dirs '("~/.emacs.d/snippets/"))
+(yas-global-mode 1)
+
+;; org-ac
+(require 'org-ac)
+;; Make config suit for you. About the config item, eval the following sexp.
+;; (customize-group "org-ac")
+(org-ac/config-default)
+
+;; ESS and R
+(add-to-list 'load-path "~/.emacs.d/elpa/ess-20170516.257/lisp")
+(require 'ess-site)
+
+;;Open browser in google chrome
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "google-chrome")
+
+;; Emmet mode
+(add-to-list 'load-path "~/emacs.d/emmet-mode")
+(require 'emmet-mode)
+
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+;; Enable ac-js2 in js2-mode
+(add-hook 'js2-mode-hook 'ac-js2-mode)
+
+;; Skewer mode
+(add-hook 'js2-mode-hook 'skewer-mode)
+(add-hook 'css-mode-hook 'skewer-css-mode)
+(add-hook 'html-mode-hook 'skewer-html-mode)
+
+;; Auto-complete
+(ac-config-default)
+
+;; Yasnippet
+(add-to-list 'load-path
+              "~/.emacs.d/elpa/yasnippet-20170418.351")
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;; Indent
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
+;; Rigid indent left key binding
+(global-set-key (kbd "C-<") 'indent-rigidly-left-to-tab-stop)
+
+;;Personal Info
+(setq user-full-name "Isaac Zhou"
+      user-mail-address "isaaczhou85@gmail.com"
+      calendar-latitude 40.7
+      calendar-longitude 74.0
+      calendar-location-name "New York City, NY")
+
+;; Comment
+(global-set-key (kbd "C-?") 'comment-region)
+(global-set-key (kbd "C-|") 'uncomment-region)
+
+;; Latex
+(load "auctex.el" nil t t)
